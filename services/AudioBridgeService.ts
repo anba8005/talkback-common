@@ -6,6 +6,7 @@ import {
 	ISimpleEventHandler,
 	SimpleEventDispatcher,
 } from 'strongly-typed-events';
+import { getUserMedia, MediaStream } from '../../utils/RTCTypes';
 import { AudioBridgePlugin, AudioBridgePluginName } from '../utils/Janus';
 import { AbstractJanusService } from './AbstractJanusService';
 import { SessionService } from './SessionService';
@@ -72,7 +73,7 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 	}
 
 	protected shouldCreatePlugin(): boolean {
-		return this._enabled;
+		return false;
 	}
 
 	protected async afterCreatePlugin() {
@@ -93,12 +94,14 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 					display: this._displayName,
 				});
 				//
-				const stream = await navigator.mediaDevices.getUserMedia({
+				const stream = await getUserMedia({
 					audio: this._aec ? AUDIO_AEC_CONSTRAINTS : true,
 					video: false,
 				});
 				//
-				await this.plugin.offerStream(stream, null, { muted: !this._talk });
+				await this.plugin.offerStream(stream as MediaStream, null, {
+					muted: !this._talk,
+				});
 			} catch (e) {
 				this.errorEvent.dispatch(e);
 				this._streamEvent.dispatch(null);

@@ -3,6 +3,7 @@ import {
 	ISimpleEventHandler,
 	SimpleEventDispatcher,
 } from 'strongly-typed-events';
+import { MediaStream, RTCDataChannel } from '../../utils/RTCTypes';
 import { getRandomIntInclusive } from '../utils/Helpers';
 import { StreamingPlugin, StreamingPluginName } from '../utils/Janus';
 import { AbstractJanusService } from './AbstractJanusService';
@@ -87,23 +88,24 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 	}
 
 	private _setupDataChannel(plugin: StreamingPlugin) {
-		const pc = plugin._pc;
+		const pc = plugin._pc as any;
 		//
 		this._channel = pc.createDataChannel(
 			String(getRandomIntInclusive(0, Number.MAX_SAFE_INTEGER - 1)),
 		);
 		//
-		pc.addEventListener('datachannel', (e) => {
-			e.channel.onmessage = (msg) => {
+		const listener = (e: any) => {
+			e.channel.onmessage = (msg: any) => {
 				try {
 					const message = String(msg.data)
 						.replaceAll('\n', '')
 						.replaceAll('\r', '');
 					this._messageEvent.dispatch(JSON.parse(message));
-				} catch (e) {
-					console.error(e);
+				} catch (ex) {
+					console.error(ex);
 				}
 			};
-		});
+		};
+		pc.addEventListener('datachannel', listener);
 	}
 }

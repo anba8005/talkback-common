@@ -1,4 +1,5 @@
 import { store } from '@risingstack/react-easy-state';
+import { MediaStream } from '../../utils/RTCTypes';
 import {
 	AudioBridgeService,
 	Participant,

@@ -44,7 +44,7 @@ export function persist<T extends any>(
 	}
 
 	if (options.saveOnUnload !== false) {
-		window.addEventListener('unload', api.saveImmediately);
+		// window.addEventListener('unload', api.saveImmediately);
 	}
 
 	return [api, wrappedStore];
@@ -57,7 +57,7 @@ const defaultSerializer = (data: any) => data;
 function saveStore(key: string, store: any, options: PersistOptions<any>) {
 	const data = getSnapshot(store, options);
 
-	localStorage.setItem(key, JSON.stringify(data));
+	// localStorage.setItem(key, JSON.stringify(data));
 	console.debug('Saved store to', key, { data });
 }
 
@@ -72,7 +72,7 @@ function loadStore<T>(
 	options: PersistOptions<any>,
 	apiStore: PersistAPI<T>,
 ) {
-	const json = localStorage.getItem(key);
+	const json = '[]'; // localStorage.getItem(key);
 
 	if (json) {
 		const data = JSON.parse(json);
