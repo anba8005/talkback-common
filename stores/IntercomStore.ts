@@ -27,6 +27,7 @@ export class IntercomStore {
 		_audioBridge.onStream((stream) => {
 			this._stream = stream;
 			this._store.connected = stream !== null;
+			console.log('intercom connected -> ' + this._store.connected);
 		});
 		_audioBridge.onList((participants) => {
 			participants.sort((p1, p2) => {

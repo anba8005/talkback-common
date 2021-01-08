@@ -1,4 +1,5 @@
 import { store } from '@risingstack/react-easy-state';
+import { MediaStream } from '../../utils/RTCTypes';
 import { StreamingService } from '../services/StreamingService';
 
 export class OffairStore {
@@ -21,6 +22,7 @@ export class OffairStore {
 		_streaming.onStream((stream) => {
 			this._stream = stream;
 			this._store.connected = stream !== null;
+			console.log('offair connected -> ' + this._store.connected);
 		});
 	}
 
