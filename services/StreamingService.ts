@@ -27,6 +27,8 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 
 	private _streamingPaused = false;
 
+	private _streamingMuted = true;
+
 	constructor(sessionService: SessionService) {
 		super(sessionService, StreamingPluginName);
 	}
@@ -41,6 +43,13 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 
 	public setStreamingEnabled(enabled: boolean) {
 		this._streamingEnabled = enabled;
+	}
+
+	public setStreamingMuted(muted: boolean) {
+		this._streamingMuted = muted;
+		if (this.plugin && this._streamingEnabled) {
+			this.plugin.configure({ audio: !muted }).catch(console.error);
+		}
 	}
 
 	public setStreamingPaused(paused: boolean) {
@@ -75,7 +84,13 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 				//
 				this._setupDataChannel(this.plugin);
 				//
-				if (!this._streamingPaused) await this.plugin.start();
+				if (this._streamingMuted) {
+					await this.plugin.configure({ audio: false });
+				}
+				//
+				if (!this._streamingPaused) {
+					await this.plugin.start();
+				}
 			} catch (e) {
 				this.errorEvent.dispatch(e);
 				this._streamEvent.dispatch(null);

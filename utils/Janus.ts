@@ -9,6 +9,7 @@ export interface StreamingPlugin extends Plugin {
 	connect: (id: number, options: any) => Promise<any>;
 	start: () => Promise<any>;
 	pause: () => Promise<any>;
+	configure: (options: any) => Promise<any>;
 	_pc: RTCPeerConnection;
 }
 

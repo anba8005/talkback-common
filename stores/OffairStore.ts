@@ -32,6 +32,7 @@ export class OffairStore {
 
 	public setMuted(muted: boolean) {
 		this._store.muted = muted;
+		this._streaming.setStreamingMuted(muted);
 	}
 
 	public get stream() {
