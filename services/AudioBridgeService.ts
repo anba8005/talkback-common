@@ -73,7 +73,7 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 	}
 
 	protected shouldCreatePlugin(): boolean {
-		return false;
+		return this._enabled;
 	}
 
 	protected async afterCreatePlugin() {
