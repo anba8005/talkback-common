@@ -6,7 +6,7 @@ import { OffairStore } from './OffairStore';
 import { TallyStore } from './TallyStore';
 import { SettingsStore } from './SettingsStore';
 
-export class RootStore {
+export class AbstractRootStore {
 	private _intercom: IntercomStore;
 	private _offair: OffairStore;
 	private _tally: TallyStore;
@@ -54,11 +54,4 @@ export class RootStore {
 	public async connect() {
 		return this._sessionService.connect(this.settings.urlWs);
 	}
-}
-
-export function createRootStore(): RootStore {
-	const sessionService = new SessionService();
-	const audioBridgeService = new AudioBridgeService(sessionService);
-	const streamingService = new StreamingService(sessionService);
-	return new RootStore(sessionService, audioBridgeService, streamingService);
 }
