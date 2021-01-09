@@ -12,14 +12,29 @@ export abstract class AbstractJanusService<T extends Plugin> {
 
 	private _roomId?: number;
 
+	private _session: Session | null = null;
+
 	constructor(private _sessionService: SessionService, private _name: string) {
 		_sessionService.onSession((session) => {
+			this._session = session;
 			if (session) {
-				this._createPlugin(session).catch(console.log);
-			} else if (this._plugin) {
-				this._destroyPlugin();
+				this.start();
+			} else {
+				this.stop();
 			}
 		});
+	}
+
+	public start() {
+		if (this._session) {
+			this._createPlugin(this._session).catch(console.log);
+		}
+	}
+
+	public stop() {
+		if (this._plugin) {
+			this._destroyPlugin();
+		}
 	}
 
 	//

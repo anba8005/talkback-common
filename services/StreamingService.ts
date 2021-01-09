@@ -55,9 +55,13 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 	public setStreamingPaused(paused: boolean) {
 		if (this._streamingPaused !== paused && this.plugin && this.roomId) {
 			if (paused) {
+				console.log('streaming paused');
 				this.plugin.pause().catch(console.error);
 			} else {
-				this.plugin.start().catch(console.error);
+				console.log('streaming started');
+				//this.plugin.start().catch(console.error);
+				this.stop();
+				this.start();
 			}
 		}
 		this._streamingPaused = paused;
