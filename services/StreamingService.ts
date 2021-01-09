@@ -57,12 +57,14 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 		if (this._streamingPaused !== paused && this.plugin && this.roomId) {
 			if (paused) {
 				console.log('streaming paused');
-				this.plugin.pause().catch(console.error);
+				if (RNDetector.isReactNative()) {
+					this.stop();
+				} else {
+					this.plugin.pause().catch(console.error);
+				}
 			} else {
 				console.log('streaming started');
 				if (RNDetector.isReactNative()) {
-					// restart plugin on react native
-					this.stop();
 					this.start();
 				} else {
 					this.plugin.start().catch(console.error);
