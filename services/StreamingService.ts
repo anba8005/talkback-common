@@ -93,13 +93,13 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 				}
 			} catch (e) {
 				this.errorEvent.dispatch(e);
-				this._streamEvent.dispatch(null);
 			}
 		}
 	}
 
 	protected beforeDestroyPlugin() {
 		this._channel?.close();
+		this._streamEvent.dispatch(null);
 	}
 
 	private _setupDataChannel(plugin: StreamingPlugin) {

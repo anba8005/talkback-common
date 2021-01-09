@@ -104,13 +104,12 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 				});
 			} catch (e) {
 				this.errorEvent.dispatch(e);
-				this._streamEvent.dispatch(null);
 			}
 		}
 	}
 
 	protected beforeDestroyPlugin(): void {
-		// noop
+		this._streamEvent.dispatch(null);
 	}
 
 	private _processIncomingEvent(event: any) {

@@ -22,6 +22,17 @@ export class SessionService {
 		this._sessionEvent.dispatch(this._session);
 	}
 
+	public async disconnect() {
+		if (this._connection) {
+			this._sessionEvent.dispatch(null);
+			const connection = this._connection;
+			this._session = undefined;
+			this._connection = undefined;
+			this._sessionEvent.dispatch(null);
+			await connection.close();
+		}
+	}
+
 	onSession(handler: ISimpleEventHandler<Session | null>) {
 		this._sessionEvent.asEvent().subscribe(handler);
 	}

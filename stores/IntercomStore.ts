@@ -1,4 +1,4 @@
-import { store } from '@risingstack/react-easy-state';
+import { batch, store } from '@risingstack/react-easy-state';
 import { MediaStream } from '../../utils/RTCTypes';
 import {
 	AudioBridgeService,
@@ -19,16 +19,22 @@ export class IntercomStore {
 	});
 
 	constructor(private _audioBridge: AudioBridgeService) {
-		_audioBridge.onError((error) => {
-			console.error(error);
-			this._error = error;
-			this._store.failed = error !== null;
-		});
-		_audioBridge.onStream((stream) => {
-			this._stream = stream;
-			this._store.connected = stream !== null;
-			console.log('intercom connected -> ' + this._store.connected);
-		});
+		_audioBridge.onError((error) =>
+			batch(() => {
+				if (error) {
+					this._setStream(null);
+				}
+				this._setError(error);
+			}),
+		);
+		_audioBridge.onStream((stream) =>
+			batch(() => {
+				if (stream) {
+					this._setError(null);
+				}
+				this._setStream(stream);
+			}),
+		);
 		_audioBridge.onList((participants) => {
 			participants.sort((p1, p2) => {
 				return p1.channel - p2.channel;
@@ -74,5 +80,20 @@ export class IntercomStore {
 
 	public get participants() {
 		return this._store.participants;
+	}
+
+	private _setError(error: Error | null) {
+		this._error = error;
+		this._store.failed = error !== null;
+		if (this._error) {
+			console.error('intercom failed with error');
+			console.error(error);
+		}
+	}
+
+	private _setStream(stream: MediaStream | null) {
+		this._stream = stream;
+		this._store.connected = stream !== null;
+		console.log('intercom connected -> ' + this._store.connected);
 	}
 }

@@ -36,6 +36,7 @@ export interface Session {
 
 export interface Connection {
 	createSession: () => Promise<Session>;
+	close: () => Promise<void>;
 }
 
 export interface Client {

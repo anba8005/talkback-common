@@ -5,12 +5,21 @@ import { IntercomStore } from './IntercomStore';
 import { OffairStore } from './OffairStore';
 import { TallyStore } from './TallyStore';
 import { SettingsStore } from './SettingsStore';
+import { store } from '@risingstack/react-easy-state';
+
+interface Store {
+	connected: boolean | null;
+}
 
 export class AbstractRootStore {
 	private _intercom: IntercomStore;
 	private _offair: OffairStore;
 	private _tally: TallyStore;
 	private _settings: SettingsStore;
+
+	private _store: Store = store({
+		connected: null,
+	});
 
 	constructor(
 		private _sessionService: SessionService,
@@ -52,6 +61,26 @@ export class AbstractRootStore {
 	}
 
 	public async connect() {
-		return this._sessionService.connect(this.settings.urlWs);
+		try {
+			await this._sessionService.connect(this.settings.urlWs);
+			this._store.connected = true;
+		} catch (e) {
+			console.error(e);
+			this._store.connected = false;
+		}
+	}
+
+	public async disconnect() {
+		try {
+			await this._sessionService.disconnect();
+		} catch (e) {
+			console.error(e);
+		} finally {
+			this._store.connected = null;
+		}
+	}
+
+	public isConnected() {
+		return this._store.connected;
 	}
 }

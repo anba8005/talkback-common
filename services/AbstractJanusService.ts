@@ -54,6 +54,9 @@ export abstract class AbstractJanusService<T extends Plugin> {
 		if (!this.shouldCreatePlugin()) return;
 		try {
 			this._plugin = await session.attachPlugin<T>(this._name);
+			this._plugin.on('error', (e) => {
+				this._errorEvent.dispatch(e);
+			});
 		} catch (e) {
 			this._errorEvent.dispatch(e);
 		}
@@ -61,7 +64,9 @@ export abstract class AbstractJanusService<T extends Plugin> {
 	}
 
 	private _destroyPlugin() {
+		this.beforeDestroyPlugin();
 		this._plugin?.detach();
 		this._plugin = undefined;
+		this._errorEvent.dispatch(null);
 	}
 }
