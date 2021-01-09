@@ -53,14 +53,14 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 	public setTalk(talk: boolean) {
 		this._talk = talk;
 		if (this.plugin) {
-			this.plugin.configure({ muted: !talk }).catch(console.log);
+			this.plugin.configure({ muted: !talk }).catch(console.error);
 		}
 	}
 
 	public setDisplayName(displayName: string) {
 		this._displayName = displayName;
 		if (this.plugin) {
-			this.plugin.configure({ display: displayName }).catch(console.log);
+			this.plugin.configure({ display: displayName }).catch(console.error);
 		}
 	}
 

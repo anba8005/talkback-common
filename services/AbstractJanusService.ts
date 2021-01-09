@@ -27,7 +27,7 @@ export abstract class AbstractJanusService<T extends Plugin> {
 
 	public start() {
 		if (this._session) {
-			this._createPlugin(this._session).catch(console.log);
+			this._createPlugin(this._session).catch(console.error);
 		}
 	}
 

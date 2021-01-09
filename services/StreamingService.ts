@@ -6,6 +6,7 @@ import {
 import { MediaStream, RTCDataChannel } from '../../utils/RTCTypes';
 import { getRandomIntInclusive } from '../utils/Helpers';
 import { StreamingPlugin, StreamingPluginName } from '../utils/Janus';
+import RNDetector from '../utils/RNDetector';
 import { AbstractJanusService } from './AbstractJanusService';
 import { SessionService } from './SessionService';
 
@@ -59,9 +60,13 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 				this.plugin.pause().catch(console.error);
 			} else {
 				console.log('streaming started');
-				//this.plugin.start().catch(console.error);
-				this.stop();
-				this.start();
+				if (RNDetector.isReactNative()) {
+					// restart plugin on react native
+					this.stop();
+					this.start();
+				} else {
+					this.plugin.start().catch(console.error);
+				}
 			}
 		}
 		this._streamingPaused = paused;
