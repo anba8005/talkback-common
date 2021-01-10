@@ -12,6 +12,11 @@ export function isPositiveOrZeroNumber(value: any) {
 	return !isNaN(num) && num >= 0;
 }
 
+export function isNumberInRange(value: any, min: number, max: number) {
+	const num = Number(value);
+	return !isNaN(num) && num >= min && num <= max;
+}
+
 export function getRandomIntInclusive(min: number, max: number) {
 	min = Math.ceil(min);
 	max = Math.floor(max);

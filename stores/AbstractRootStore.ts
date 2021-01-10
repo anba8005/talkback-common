@@ -1,5 +1,4 @@
 import { SessionService } from '../services/SessionService';
-import { AudioBridgeService } from '../services/AudioBridgeService';
 import { StreamingService } from '../services/StreamingService';
 import { IntercomStore } from './IntercomStore';
 import { OffairStore } from './OffairStore';
@@ -23,12 +22,11 @@ export class AbstractRootStore {
 
 	constructor(
 		private _sessionService: SessionService,
-		private _audioBridgeService: AudioBridgeService,
 		private _streamingService: StreamingService,
 		private _tallyService: StreamingService,
 		persister: SettingsPersister,
 	) {
-		this._intercom = new IntercomStore(_audioBridgeService);
+		this._intercom = new IntercomStore(_sessionService);
 		this._offair = new OffairStore(_streamingService);
 		this._tally = new TallyStore(_tallyService);
 		this._settings = new SettingsStore(persister);
@@ -53,11 +51,22 @@ export class AbstractRootStore {
 	public async hydrate() {
 		// load settings
 		await this._settings.hydrate();
-		// update service settings
-		this._audioBridgeService.setEnabled(this.settings.intercom);
-		this._audioBridgeService.setAEC(this.settings.aec);
-		this._audioBridgeService.setRoomId(this.settings.roomId);
-		this._audioBridgeService.setDisplayName(String(this.settings.channel));
+		// update common group settings
+		this._intercom.setNumGroups(this.settings.numGroups);
+		this._intercom.groups.forEach((group) => {
+			group._service.setAutoStart(false);
+			group._service.setAEC(this.settings.aec);
+			group._service.setDisplayName(String(this.settings.channel));
+			group.reset();
+		});
+		// start room if not multiroom
+		if (!this.settings.multiRoom) {
+			console.debug(`Activating intercom group -> ${this.settings.roomId}`);
+			this._intercom.activateAndStartGroupById(this.settings.roomId);
+		} else {
+			console.debug(`Deactivating intercom group -> ${this.settings.roomId}`);
+			this._intercom.activateAndStartGroupById(0);
+		}
 		//
 		this._streamingService.setStreamingEnabled(this.settings.offair);
 		this._streamingService.setRoomId(1);

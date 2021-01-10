@@ -7,20 +7,22 @@ export abstract class SettingsPersister {
 
 export interface Settings {
 	url: string;
-	roomId: number;
+	groupId: number;
 	channel: number;
 	intercom: boolean;
 	offair: boolean;
 	aec: boolean;
+	numGroups: number;
 }
 
 const DEFAULT: Settings = {
 	url: 'wss://turn.b3video.lt/janus',
-	roomId: 1,
+	groupId: 1,
 	channel: 0,
 	intercom: true,
 	offair: true,
 	aec: false,
+	numGroups: 8,
 };
 
 export class SettingsStore {
@@ -54,7 +56,7 @@ export class SettingsStore {
 	}
 
 	public get roomId() {
-		return this._settings.roomId;
+		return this._settings.groupId;
 	}
 
 	public get channel() {
@@ -73,12 +75,20 @@ export class SettingsStore {
 		return this._settings.aec;
 	}
 
+	public get numGroups() {
+		return this._settings.numGroups;
+	}
+
 	public get dialogOpen() {
 		return this._store.dialogOpen;
 	}
 
 	public setDialogOpen(open: boolean) {
 		this._store.dialogOpen = open;
+	}
+
+	public get multiRoom() {
+		return this._settings.groupId === 0;
 	}
 
 	public applySettings(
@@ -88,14 +98,16 @@ export class SettingsStore {
 		intercom: boolean,
 		offair: boolean,
 		aec: boolean,
+		numGroups: number,
 	) {
 		batch(() => {
 			this._settings.url = url;
-			this._settings.roomId = roomId;
+			this._settings.groupId = roomId;
 			this._settings.channel = channel;
 			this._settings.intercom = intercom;
 			this._settings.offair = offair;
 			this._settings.aec = aec;
+			this._settings.numGroups = numGroups;
 		});
 		//
 		this._presister.save({ ...this._settings }).catch(console.error);

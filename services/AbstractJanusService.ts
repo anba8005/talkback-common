@@ -14,8 +14,11 @@ export abstract class AbstractJanusService<T extends Plugin> {
 
 	private _session: Session | null = null;
 
-	constructor(private _sessionService: SessionService, private _name: string) {
-		_sessionService.onSession((session) => {
+	private _autoStart = true;
+
+	constructor(sessionService: SessionService, private _name: string) {
+		sessionService.onSession((session) => {
+			console.debug('got session ' + this._name + ' ' + String(!!session));
 			this._session = session;
 			if (session) {
 				this.start().catch(console.error);
@@ -23,6 +26,10 @@ export abstract class AbstractJanusService<T extends Plugin> {
 				this.stop();
 			}
 		});
+	}
+
+	public setAutoStart(autoStart: boolean) {
+		this._autoStart = autoStart;
 	}
 
 	public start() {
@@ -49,7 +56,7 @@ export abstract class AbstractJanusService<T extends Plugin> {
 		return this._plugin;
 	}
 
-	protected get roomId() {
+	public get roomId() {
 		return this._roomId;
 	}
 
@@ -61,14 +68,13 @@ export abstract class AbstractJanusService<T extends Plugin> {
 		return this._errorEvent.asEvent().subscribe(handler);
 	}
 
-	protected abstract shouldCreatePlugin(): boolean;
-
 	protected abstract afterCreatePlugin(): Promise<void>;
 
 	protected abstract beforeDestroyPlugin(): void;
 
 	private async _createPlugin(session: Session) {
-		if (!this.shouldCreatePlugin()) return;
+		if (!this._autoStart) return;
+		console.debug('starting ' + this._name);
 		try {
 			this._plugin = await session.attachPlugin<T>(this._name);
 			this._plugin.on('error', (e) => {

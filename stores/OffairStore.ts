@@ -79,6 +79,6 @@ export class OffairStore {
 	private _setStream(stream: MediaStream | null) {
 		this._stream = stream;
 		this._store.connected = stream !== null;
-		console.log(`offair connected -> ${String(this._store.connected)}`);
+		console.log(`offair stream arrived -> ${String(this._store.connected)}`);
 	}
 }

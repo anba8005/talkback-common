@@ -14,7 +14,7 @@ import { AudioBridgePlugin, AudioBridgePluginName } from '../utils/Janus';
 import { AbstractJanusService } from './AbstractJanusService';
 import { SessionService } from './SessionService';
 
-const AUDIO_AEC_CONSTRAINTS = {
+const AUDIO_NO_AEC_CONSTRAINTS = {
 	echoCancellation: false,
 	googEchoCancellation: false,
 	googEchoCancellation2: false,
@@ -27,11 +27,11 @@ export interface Participant {
 }
 
 export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> {
+	private static _stream?: MediaStream;
+
 	private _streamEvent = new SimpleEventDispatcher<MediaStream | null>();
 
 	private _listEvent = new SimpleEventDispatcher<Participant[]>();
-
-	private _enabled = true;
 
 	private _talk = false;
 
@@ -56,6 +56,11 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 	public setTalk(talk: boolean) {
 		this._talk = talk;
 		if (this.plugin) {
+			console.debug(
+				`Setting audioBridge ${String(this.roomId)} -> talk -> ${String(
+					this._talk,
+				)}`,
+			);
 			this.plugin.configure({ muted: !talk }).catch(console.error);
 		}
 	}
@@ -67,20 +72,17 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 		}
 	}
 
-	public setEnabled(enabled: boolean) {
-		this._enabled = enabled;
-	}
-
 	public setAEC(aec: boolean) {
 		this._aec = aec;
 	}
 
-	protected shouldCreatePlugin(): boolean {
-		return this._enabled;
-	}
-
 	protected async afterCreatePlugin() {
 		if (this.plugin && this.roomId) {
+			console.debug(
+				`Starting audioBridge ${String(this.roomId)} -> talk -> ${String(
+					this._talk,
+				)}`,
+			);
 			//
 			this.plugin.on('pc:track:remote', (event) => {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -96,12 +98,15 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 					display: this._displayName,
 				});
 				//
-				const stream = await getUserMedia({
-					audio: this._aec ? AUDIO_AEC_CONSTRAINTS : true,
-					video: false,
-				});
+				if (!AudioBridgeService._stream) {
+					console.debug('executing getUserMedia');
+					AudioBridgeService._stream = await getUserMedia({
+						audio: !this._aec ? AUDIO_NO_AEC_CONSTRAINTS : true,
+						video: false,
+					});
+				}
 				//
-				await this.plugin.offerStream(stream, null, {
+				await this.plugin.offerStream(AudioBridgeService._stream, null, {
 					muted: !this._talk,
 				});
 			} catch (e) {
@@ -144,4 +149,15 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 		//
 		this._listEvent.dispatch(participants);
 	}
+}
+
+export function createAudioBridgeService(
+	sessionService: SessionService,
+	roomId: number,
+	autoStart: boolean,
+) {
+	const service = new AudioBridgeService(sessionService);
+	service.setRoomId(roomId);
+	service.setAutoStart(autoStart);
+	return service;
 }

@@ -73,10 +73,6 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 		this._streamingPaused = paused;
 	}
 
-	protected shouldCreatePlugin(): boolean {
-		return true;
-	}
-
 	protected async afterCreatePlugin() {
 		if (this.plugin && this.roomId) {
 			//
