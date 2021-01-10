@@ -1,5 +1,9 @@
 import { store, batch } from '@risingstack/react-easy-state';
-import persist, { PersistAPI } from '../utils/Persist';
+
+export abstract class SettingsPersister {
+	public abstract load(): Promise<Settings | null>;
+	public abstract save(settings: Settings): Promise<void>;
+}
 
 export interface Settings {
 	url: string;
@@ -26,20 +30,11 @@ export class SettingsStore {
 		dialogOpen: false,
 	});
 
-	private _presister: PersistAPI<Settings>;
-
-	constructor() {
-		const [persister] = persist<Settings>(this._settings, {
-			storageKey: 'settings-store',
-			autoLoad: false,
-		});
-		this._presister = persister;
-	}
+	constructor(private _presister: SettingsPersister) {}
 
 	public async hydrate() {
-		// TODO make async
-		this._presister.load();
-		return Promise.resolve();
+		const settings = await this._presister.load();
+		Object.assign(this._settings, settings);
 	}
 
 	public get url() {
@@ -102,6 +97,7 @@ export class SettingsStore {
 			this._settings.offair = offair;
 			this._settings.aec = aec;
 		});
-		this._presister.saveImmediately();
+		//
+		this._presister.save({ ...this._settings }).catch(console.error);
 	}
 }

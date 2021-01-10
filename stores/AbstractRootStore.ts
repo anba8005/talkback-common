@@ -4,7 +4,7 @@ import { StreamingService } from '../services/StreamingService';
 import { IntercomStore } from './IntercomStore';
 import { OffairStore } from './OffairStore';
 import { TallyStore } from './TallyStore';
-import { SettingsStore } from './SettingsStore';
+import { SettingsPersister, SettingsStore } from './SettingsStore';
 import { store } from '@risingstack/react-easy-state';
 
 interface Store {
@@ -26,11 +26,12 @@ export class AbstractRootStore {
 		private _audioBridgeService: AudioBridgeService,
 		private _streamingService: StreamingService,
 		private _tallyService: StreamingService,
+		persister: SettingsPersister,
 	) {
 		this._intercom = new IntercomStore(_audioBridgeService);
 		this._offair = new OffairStore(_streamingService);
 		this._tally = new TallyStore(_tallyService);
-		this._settings = new SettingsStore();
+		this._settings = new SettingsStore(persister);
 	}
 
 	public get intercom() {
