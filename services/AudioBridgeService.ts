@@ -6,7 +6,10 @@ import {
 	ISimpleEventHandler,
 	SimpleEventDispatcher,
 } from 'strongly-typed-events';
-import { getUserMedia, MediaStream } from '../../utils/RTCTypes';
+import {
+	getUserMedia,
+	CMediaStream as MediaStream,
+} from '../../utils/RTCTypes';
 import { AudioBridgePlugin, AudioBridgePluginName } from '../utils/Janus';
 import { AbstractJanusService } from './AbstractJanusService';
 import { SessionService } from './SessionService';
@@ -98,7 +101,7 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 					video: false,
 				});
 				//
-				await this.plugin.offerStream(stream as MediaStream, null, {
+				await this.plugin.offerStream(stream, null, {
 					muted: !this._talk,
 				});
 			} catch (e) {

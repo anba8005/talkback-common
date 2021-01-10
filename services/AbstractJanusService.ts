@@ -18,7 +18,7 @@ export abstract class AbstractJanusService<T extends Plugin> {
 		_sessionService.onSession((session) => {
 			this._session = session;
 			if (session) {
-				this.start();
+				this.start().catch(console.error);
 			} else {
 				this.stop();
 			}
@@ -28,6 +28,8 @@ export abstract class AbstractJanusService<T extends Plugin> {
 	public start() {
 		if (this._session) {
 			return this._createPlugin(this._session).catch(console.error);
+		} else {
+			return Promise.resolve();
 		}
 	}
 

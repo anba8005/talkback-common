@@ -1,5 +1,5 @@
 import { batch, store } from '@risingstack/react-easy-state';
-import { MediaStream } from '../../utils/RTCTypes';
+import { CMediaStream as MediaStream } from '../../utils/RTCTypes';
 import {
 	AudioBridgeService,
 	Participant,
@@ -94,6 +94,6 @@ export class IntercomStore {
 	private _setStream(stream: MediaStream | null) {
 		this._stream = stream;
 		this._store.connected = stream !== null;
-		console.log('intercom connected -> ' + this._store.connected);
+		console.log(`intercom connected -> ${String(this._store.connected)}`);
 	}
 }

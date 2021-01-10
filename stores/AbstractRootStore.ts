@@ -77,7 +77,7 @@ export class AbstractRootStore {
 		}
 	}
 
-	public async disconnect() {
+	public disconnect() {
 		this._store.connected = null;
 		setTimeout(() => {
 			this._sessionService.disconnect().catch(console.error);

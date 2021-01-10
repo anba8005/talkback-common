@@ -1,7 +1,6 @@
 import { batch, store } from '@risingstack/react-easy-state';
-import { MediaStream } from '../../utils/RTCTypes';
+import { CMediaStream as MediaStream, reactNative } from '../../utils/RTCTypes';
 import { StreamingService } from '../services/StreamingService';
-import RNDetector from '../utils/RNDetector';
 
 export class OffairStore {
 	private _stream: MediaStream | null = null;
@@ -59,8 +58,10 @@ export class OffairStore {
 	}
 
 	public updateVisible(visible: boolean) {
-		if (RNDetector.isReactNative) {
-			visible ? this._streaming.start() : this._streaming.stop();
+		if (reactNative) {
+			visible
+				? this._streaming.start().catch(console.log)
+				: this._streaming.stop();
 		} else {
 			this._streaming.setStreamingPaused(!visible);
 		}
@@ -78,6 +79,6 @@ export class OffairStore {
 	private _setStream(stream: MediaStream | null) {
 		this._stream = stream;
 		this._store.connected = stream !== null;
-		console.log('offair connected -> ' + this._store.connected);
+		console.log(`offair connected -> ${String(this._store.connected)}`);
 	}
 }

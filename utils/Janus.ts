@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { RTCPeerConnection, MediaStream } from '../../utils/RTCTypes';
+import {
+	CRTCPeerConnection as RTCPeerConnection,
+	CMediaStream as MediaStream,
+} from '../../utils/RTCTypes';
 
 const Janus = require('janus-gateway-js');
 

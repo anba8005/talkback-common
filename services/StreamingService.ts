@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
 	ISimpleEventHandler,
 	SimpleEventDispatcher,
 } from 'strongly-typed-events';
-import { MediaStream, RTCDataChannel } from '../../utils/RTCTypes';
+import {
+	CMediaStream as MediaStream,
+	CRTCDataChannel as RTCDataChannel,
+} from '../../utils/RTCTypes';
 import { getRandomIntInclusive } from '../utils/Helpers';
 import { StreamingPlugin, StreamingPluginName } from '../utils/Janus';
 import { AbstractJanusService } from './AbstractJanusService';
@@ -111,13 +115,14 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 	}
 
 	private _setupDataChannel(plugin: StreamingPlugin) {
-		const pc = plugin._pc as any;
+		const pc = plugin._pc;
 		//
 		this._channel = pc.createDataChannel(
 			String(getRandomIntInclusive(0, Number.MAX_SAFE_INTEGER - 1)),
 		);
 		//
 		const listener = (e: any) => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			e.channel.onmessage = (msg: any) => {
 				try {
 					const message = String(msg.data)
