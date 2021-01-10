@@ -25,10 +25,11 @@ export class AbstractRootStore {
 		private _sessionService: SessionService,
 		private _audioBridgeService: AudioBridgeService,
 		private _streamingService: StreamingService,
+		private _tallyService: StreamingService,
 	) {
 		this._intercom = new IntercomStore(_audioBridgeService);
 		this._offair = new OffairStore(_streamingService);
-		this._tally = new TallyStore(_streamingService);
+		this._tally = new TallyStore(_tallyService);
 		this._settings = new SettingsStore();
 	}
 
@@ -56,8 +57,13 @@ export class AbstractRootStore {
 		this._audioBridgeService.setAEC(this.settings.aec);
 		this._audioBridgeService.setRoomId(this.settings.roomId);
 		this._audioBridgeService.setDisplayName(String(this.settings.channel));
+		//
 		this._streamingService.setStreamingEnabled(this.settings.offair);
-		this._streamingService.setRoomId(this.settings.roomId);
+		this._streamingService.setRoomId(1);
+		//
+		this._tallyService.setStreamingEnabled(false);
+		this._tallyService.setDatachannelEnabled(true);
+		this._tallyService.setRoomId(100);
 	}
 
 	public async connect() {

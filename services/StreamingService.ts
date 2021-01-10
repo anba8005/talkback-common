@@ -23,6 +23,8 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 
 	private _channel?: RTCDataChannel;
 
+	private _datachannelEnabled = false;
+
 	private _streamingEnabled = true;
 
 	private _streamingPaused = false;
@@ -43,6 +45,10 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 
 	public setStreamingEnabled(enabled: boolean) {
 		this._streamingEnabled = enabled;
+	}
+
+	public setDatachannelEnabled(enabled: boolean) {
+		this._datachannelEnabled = enabled;
 	}
 
 	public setStreamingMuted(muted: boolean) {
@@ -82,7 +88,9 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 			try {
 				await this.plugin.connect(this.roomId, options);
 				//
-				this._setupDataChannel(this.plugin);
+				if (this._datachannelEnabled) {
+					this._setupDataChannel(this.plugin);
+				}
 				//
 				if (this._streamingMuted && this._streamingEnabled) {
 					await this.plugin.configure({ audio: false });

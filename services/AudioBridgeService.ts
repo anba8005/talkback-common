@@ -78,7 +78,6 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 
 	protected async afterCreatePlugin() {
 		if (this.plugin && this.roomId) {
-			const roomId = this.roomId * 10; // possible aux rooms :)
 			//
 			this.plugin.on('pc:track:remote', (event) => {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -90,7 +89,7 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 			this._participants.clear();
 			//
 			try {
-				await this.plugin.connect(roomId, {
+				await this.plugin.connect(this.roomId, {
 					display: this._displayName,
 				});
 				//
