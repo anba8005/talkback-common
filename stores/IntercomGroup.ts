@@ -11,6 +11,7 @@ const DEFAULTS = {
 	participants: [] as Participant[],
 	muted: true,
 	talk: false,
+	busy: false,
 };
 
 export class IntercomGroup {
@@ -90,12 +91,17 @@ export class IntercomGroup {
 		return this._store.participants;
 	}
 
+	public get busy() {
+		return this._store.busy;
+	}
+
 	public get _service() {
 		return this._audioBridge;
 	}
 
 	public start() {
 		batch(() => {
+			this._store.busy = true;
 			this._audioBridge.setAutoStart(true);
 			this._audioBridge.start().catch(console.error);
 			this._store.muted = false;
@@ -104,6 +110,7 @@ export class IntercomGroup {
 
 	public stop() {
 		batch(() => {
+			this._store.busy = true;
 			this._store.participants = [];
 			this._store.muted = true;
 			this._audioBridge.stop();
@@ -120,6 +127,7 @@ export class IntercomGroup {
 	private _setError(error: Error | null) {
 		this._error = error;
 		this._store.failed = error !== null;
+		this._store.busy = false;
 		if (this._error) {
 			console.error('intercom failed with error');
 			console.error(error);
@@ -129,6 +137,7 @@ export class IntercomGroup {
 	private _setStream(stream: MediaStream | null) {
 		this._stream = stream;
 		this._store.connected = stream !== null;
+		this._store.busy = false;
 		console.log(`intercom stream arrived -> ${String(this._store.connected)}`);
 	}
 }
