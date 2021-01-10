@@ -6,7 +6,6 @@ import {
 import { MediaStream, RTCDataChannel } from '../../utils/RTCTypes';
 import { getRandomIntInclusive } from '../utils/Helpers';
 import { StreamingPlugin, StreamingPluginName } from '../utils/Janus';
-import RNDetector from '../utils/RNDetector';
 import { AbstractJanusService } from './AbstractJanusService';
 import { SessionService } from './SessionService';
 
@@ -56,19 +55,9 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 	public setStreamingPaused(paused: boolean) {
 		if (this._streamingPaused !== paused && this.plugin && this.roomId) {
 			if (paused) {
-				console.log('streaming paused');
-				if (RNDetector.isReactNative()) {
-					this.stop();
-				} else {
-					this.plugin.pause().catch(console.error);
-				}
+				this.plugin.pause().catch(console.error);
 			} else {
-				console.log('streaming started');
-				if (RNDetector.isReactNative()) {
-					this.start();
-				} else {
-					this.plugin.start().catch(console.error);
-				}
+				this.plugin.start().catch(console.error);
 			}
 		}
 		this._streamingPaused = paused;
@@ -95,7 +84,7 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 				//
 				this._setupDataChannel(this.plugin);
 				//
-				if (this._streamingMuted) {
+				if (this._streamingMuted && this._streamingEnabled) {
 					await this.plugin.configure({ audio: false });
 				}
 				//
