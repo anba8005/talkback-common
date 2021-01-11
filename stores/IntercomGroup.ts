@@ -104,7 +104,6 @@ export class IntercomGroup {
 			this._store.busy = true;
 			this._audioBridge.setAutoStart(true);
 			this._audioBridge.start().catch(console.error);
-			this._store.muted = false;
 		});
 	}
 
@@ -112,6 +111,7 @@ export class IntercomGroup {
 		batch(() => {
 			this._store.busy = true;
 			this._store.muted = true;
+			this._store.participants = [];
 			this._audioBridge.stop();
 			this._audioBridge.setAutoStart(false);
 			this.setTalk(false);
@@ -127,7 +127,6 @@ export class IntercomGroup {
 		this._error = error;
 		this._store.failed = error !== null;
 		this._store.busy = false;
-		this._store.participants = [];
 		if (this._error) {
 			console.error('intercom failed with error');
 			console.error(error);
