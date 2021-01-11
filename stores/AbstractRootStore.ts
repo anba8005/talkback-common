@@ -68,7 +68,7 @@ export class AbstractRootStore {
 			this._intercom.activateAndStartGroupById(0);
 		}
 		//
-		this._streamingService.setStreamingEnabled(this.settings.offair);
+		this._streamingService.setAutoStart(this.settings.offair);
 		this._streamingService.setRoomId(1);
 		//
 		this._tallyService.setStreamingEnabled(false);

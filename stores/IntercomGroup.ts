@@ -111,7 +111,6 @@ export class IntercomGroup {
 	public stop() {
 		batch(() => {
 			this._store.busy = true;
-			this._store.participants = [];
 			this._store.muted = true;
 			this._audioBridge.stop();
 			this._audioBridge.setAutoStart(false);
@@ -128,6 +127,7 @@ export class IntercomGroup {
 		this._error = error;
 		this._store.failed = error !== null;
 		this._store.busy = false;
+		this._store.participants = [];
 		if (this._error) {
 			console.error('intercom failed with error');
 			console.error(error);

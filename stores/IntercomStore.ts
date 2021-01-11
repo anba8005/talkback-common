@@ -50,6 +50,15 @@ export class IntercomStore {
 		return this._limitedGroups;
 	}
 
+	public get anyConnected() {
+		for (const group of this.limitedGroups) {
+			if (group.connected) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public setNumGroups(numGroups: number) {
 		this._store.numGroups = numGroups;
 	}
