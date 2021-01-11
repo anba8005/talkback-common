@@ -28,6 +28,7 @@ export interface Participant {
 
 export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> {
 	private static _stream?: MediaStream;
+	private static _numStreamUsers = 0;
 
 	private _streamEvent = new SimpleEventDispatcher<MediaStream | null>();
 
@@ -94,6 +95,9 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 			this._participants.clear();
 			//
 			try {
+				//
+				AudioBridgeService._numStreamUsers++;
+				//
 				await this.plugin.connect(this.roomId, {
 					display: this._displayName,
 				});
@@ -117,6 +121,17 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 
 	protected beforeDestroyPlugin(): void {
 		this._streamEvent.dispatch(null);
+		AudioBridgeService._numStreamUsers--;
+		if (
+			AudioBridgeService._numStreamUsers === 0 &&
+			AudioBridgeService._stream
+		) {
+			console.debug('killing getUserMedia stream');
+			AudioBridgeService._stream
+				.getTracks()
+				.forEach((track: MediaStreamTrack) => track.stop());
+			AudioBridgeService._stream = undefined;
+		}
 	}
 
 	private _processIncomingEvent(event: any) {
