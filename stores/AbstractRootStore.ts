@@ -49,8 +49,22 @@ export class AbstractRootStore {
 	}
 
 	public async hydrate() {
-		// load settings
 		await this._settings.hydrate();
+	}
+
+	public async connect() {
+		this._applyConfiguration();
+		//
+		try {
+			await this._sessionService.connect(this.settings.urlWs);
+			this._store.connected = true;
+		} catch (e) {
+			console.error(e);
+			this._store.connected = false;
+		}
+	}
+
+	private _applyConfiguration() {
 		// update common group settings
 		this._intercom.setNumGroups(this.settings.numGroups);
 		this._intercom.groups.forEach((group) => {
@@ -74,16 +88,6 @@ export class AbstractRootStore {
 		this._tallyService.setStreamingEnabled(false);
 		this._tallyService.setDatachannelEnabled(true);
 		this._tallyService.setRoomId(100);
-	}
-
-	public async connect() {
-		try {
-			await this._sessionService.connect(this.settings.urlWs);
-			this._store.connected = true;
-		} catch (e) {
-			console.error(e);
-			this._store.connected = false;
-		}
 	}
 
 	public disconnect() {
