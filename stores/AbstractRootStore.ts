@@ -59,8 +59,8 @@ export class AbstractRootStore {
 			await this._sessionService.connect(this.settings.urlWs);
 			this._store.connected = true;
 		} catch (e) {
-			console.error(e);
 			this._store.connected = false;
+			throw e;
 		}
 	}
 
