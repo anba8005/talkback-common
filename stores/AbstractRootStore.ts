@@ -5,9 +5,11 @@ import { OffairStore } from './OffairStore';
 import { TallyStore } from './TallyStore';
 import { SettingsPersister, SettingsStore } from './SettingsStore';
 import { store } from '@risingstack/react-easy-state';
+import { NotificationStore } from './NotificationStore';
 
 interface Store {
 	connected: boolean | null;
+	failed: boolean;
 }
 
 export class AbstractRootStore {
@@ -15,9 +17,11 @@ export class AbstractRootStore {
 	private _offair: OffairStore;
 	private _tally: TallyStore;
 	private _settings: SettingsStore;
+	private _notification: NotificationStore;
 
 	private _store: Store = store({
 		connected: null,
+		failed: false,
 	});
 
 	constructor(
@@ -30,6 +34,9 @@ export class AbstractRootStore {
 		this._offair = new OffairStore(_streamingService);
 		this._tally = new TallyStore(_tallyService);
 		this._settings = new SettingsStore(persister);
+		this._notification = new NotificationStore();
+		//
+		_sessionService.onFailed(() => (this._store.failed = true));
 	}
 
 	public get intercom() {
@@ -46,6 +53,10 @@ export class AbstractRootStore {
 
 	public get settings() {
 		return this._settings;
+	}
+
+	public get notification() {
+		return this._notification;
 	}
 
 	public async hydrate() {
@@ -99,5 +110,9 @@ export class AbstractRootStore {
 
 	public isConnected() {
 		return this._store.connected;
+	}
+
+	public isFailed() {
+		return this._store.failed;
 	}
 }

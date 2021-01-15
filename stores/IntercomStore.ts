@@ -59,6 +59,15 @@ export class IntercomStore {
 		return false;
 	}
 
+	public get anyFailed() {
+		for (const group of this.limitedGroups) {
+			if (group.failed) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public setNumGroups(numGroups: number) {
 		this._store.numGroups = numGroups;
 	}

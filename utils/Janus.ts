@@ -40,6 +40,8 @@ export interface Session {
 export interface Connection {
 	createSession: () => Promise<Session>;
 	close: () => Promise<void>;
+	on: (event: string, handler: () => void) => void;
+	removeAllListeners: (event: string) => void;
 }
 
 export interface Client {
