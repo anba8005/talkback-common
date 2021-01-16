@@ -117,8 +117,4 @@ export class AbstractRootStore {
 	public isConnected() {
 		return this._store.connected;
 	}
-
-	public isFailed() {
-		return this._store.failed;
-	}
 }
