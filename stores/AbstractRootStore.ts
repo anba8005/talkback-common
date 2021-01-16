@@ -4,7 +4,7 @@ import { IntercomStore } from './IntercomStore';
 import { OffairStore } from './OffairStore';
 import { TallyStore } from './TallyStore';
 import { SettingsPersister, SettingsStore } from './SettingsStore';
-import { store } from '@risingstack/react-easy-state';
+import { autoEffect, store } from '@risingstack/react-easy-state';
 import { NotificationStore } from './NotificationStore';
 
 interface Store {
@@ -37,6 +37,10 @@ export class AbstractRootStore {
 		this._notification = new NotificationStore();
 		//
 		_sessionService.onFailed(() => (this._store.failed = true));
+		//
+		autoEffect(() => {
+			this._notification.updateOnline(!this._store.failed);
+		});
 	}
 
 	public get intercom() {
@@ -64,6 +68,7 @@ export class AbstractRootStore {
 	}
 
 	public async connect() {
+		this._store.failed = false;
 		this._applyConfiguration();
 		//
 		try {
@@ -71,6 +76,7 @@ export class AbstractRootStore {
 			this._store.connected = true;
 		} catch (e) {
 			this._store.connected = false;
+			this._store.failed = true;
 			throw e;
 		}
 	}
