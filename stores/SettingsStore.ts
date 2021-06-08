@@ -52,7 +52,7 @@ export class SettingsStore {
 	public get urlHttp() {
 		return this._settings.url
 			.replace(/ws:\/\//g, 'http://')
-			.replace(/wsss:\/\//g, 'https://');
+			.replace(/wss:\/\//g, 'https://');
 	}
 
 	public get roomId() {
