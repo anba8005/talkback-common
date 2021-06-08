@@ -122,8 +122,8 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 			e.channel.onmessage = (msg: any) => {
 				try {
 					const message = String(msg.data)
-						.replaceAll('\n', '')
-						.replaceAll('\r', '');
+						.replace(/\n/g, '')
+						.replace(/\r/g, '');
 					this._messageEvent.dispatch(JSON.parse(message));
 				} catch (ex) {
 					console.error(ex);

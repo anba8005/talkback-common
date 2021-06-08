@@ -45,14 +45,14 @@ export class SettingsStore {
 
 	public get urlWs() {
 		return this._settings.url
-			.replaceAll('http://', 'ws://')
-			.replaceAll('https://', 'wss://');
+			.replace(/http:\/\//g, 'ws://')
+			.replace(/https:\/\//g, 'wss://');
 	}
 
 	public get urlHttp() {
 		return this._settings.url
-			.replaceAll('ws://', 'http://')
-			.replaceAll('wss://', 'https://');
+			.replace(/ws:\/\//g, 'http://')
+			.replace(/wsss:\/\//g, 'https://');
 	}
 
 	public get roomId() {
