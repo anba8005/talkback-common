@@ -113,7 +113,7 @@ export class AudioBridgeService extends AbstractJanusService<AudioBridgePlugin> 
 				await this.plugin.offerStream(AudioBridgeService._stream, null, {
 					muted: !this._talk,
 				});
-			} catch (e) {
+			} catch (e: any) {
 				this.errorEvent.dispatch(e);
 			}
 		}

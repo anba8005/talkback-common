@@ -80,7 +80,7 @@ export abstract class AbstractJanusService<T extends Plugin> {
 			this._plugin.on('error', (e) => {
 				this._errorEvent.dispatch(e);
 			});
-		} catch (e) {
+		} catch (e: any) {
 			this._errorEvent.dispatch(e);
 		}
 		await this.afterCreatePlugin();
