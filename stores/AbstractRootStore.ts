@@ -91,12 +91,14 @@ export class AbstractRootStore {
 			group.reset();
 		});
 		// start room if not multiroom
-		if (!this.settings.multiRoom) {
-			console.debug(`Activating intercom group -> ${this.settings.roomId}`);
-			this._intercom.activateAndStartGroupById(this.settings.roomId);
-		} else {
-			console.debug(`Deactivating intercom group -> ${this.settings.roomId}`);
-			this._intercom.activateAndStartGroupById(0);
+		if (this.settings.intercom) {
+			if (!this.settings.multiRoom) {
+				console.debug(`Activating intercom group -> ${this.settings.roomId}`);
+				this._intercom.activateAndStartGroupById(this.settings.roomId);
+			} else {
+				console.debug(`Deactivating intercom group -> ${this.settings.roomId}`);
+				this._intercom.activateAndStartGroupById(0);
+			}
 		}
 		//
 		this._streamingService.setAutoStart(this.settings.offair);
