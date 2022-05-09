@@ -99,7 +99,7 @@ export class StreamingService extends AbstractJanusService<StreamingPlugin> {
 				if (!this._streamingPaused) {
 					await this.plugin.start();
 				}
-			} catch (e) {
+			} catch (e: any) {
 				this.errorEvent.dispatch(e);
 			}
 		}
