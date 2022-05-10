@@ -19,6 +19,8 @@ export class AbstractRootStore {
 	private _settings: SettingsStore;
 	private _notification: NotificationStore;
 
+	private _reconnectTimeout: any;
+
 	private _store: Store = store({
 		connected: null,
 		failed: false,
@@ -36,7 +38,12 @@ export class AbstractRootStore {
 		this._settings = new SettingsStore(persister);
 		this._notification = new NotificationStore();
 		//
-		_sessionService.onFailed(() => (this._store.failed = true));
+		_sessionService.onFailed(() => {
+			this._store.failed = true;
+			if (!this._reconnectTimeout) {
+				this._reconnectWithTimeout();
+			}
+		});
 		//
 		autoEffect(() => {
 			this._notification.updateOnline(!this._store.failed);
@@ -110,7 +117,10 @@ export class AbstractRootStore {
 	}
 
 	public disconnect() {
+		clearTimeout(this._reconnectTimeout);
+		this._reconnectTimeout = undefined;
 		this._store.connected = null;
+		this._store.failed = false;
 		setTimeout(() => {
 			this._sessionService.disconnect().catch(console.error);
 		});
@@ -118,5 +128,28 @@ export class AbstractRootStore {
 
 	public isConnected() {
 		return this._store.connected;
+	}
+
+	private async _reconnect() {
+		this._store.failed = false;
+		try {
+			await this._sessionService.disconnect();
+			await this._sessionService.connect(this.settings.urlWs);
+		} catch (e) {
+			this._store.failed = true;
+			throw e;
+		}
+	}
+
+	private _reconnectWithTimeout() {
+		this._reconnectTimeout = setTimeout(() => {
+			this._reconnect()
+				.then(() => {
+					this._reconnectTimeout = undefined;
+				})
+				.catch(() => {
+					this._reconnectWithTimeout();
+				});
+		}, 5000);
 	}
 }
