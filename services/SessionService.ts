@@ -17,6 +17,18 @@ export class SessionService {
 	public async connect(url: string) {
 		this._janus = new Janus.Client(url, {
 			keepalive: 'true',
+			pc: {
+				config: {
+					iceServers: [
+						{ urls: 'stun:stun.l.google.com:19302' },
+						{
+							urls: 'turn:turn.b3video.lt:3478?transport=udp',
+							credential: 'turn',
+							username: 'turn',
+						},
+					],
+				},
+			},
 		}) as Client;
 		this._connection = await this._janus.createConnection();
 		this._connection.on('close', () => this._failedEvent.dispatch());
