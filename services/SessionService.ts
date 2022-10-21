@@ -1,10 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
 	ISimpleEventHandler,
 	SimpleEventDispatcher,
 } from 'strongly-typed-events';
 import Janus, { Client, Connection, Session } from '../utils/Janus';
+
+export interface TimeoutHandler {
+	setTimeout: (handler: () => void, timeout: number) => any;
+	clearTimeout: (timeoutId: any) => void;
+}
 
 export class SessionService {
 	private _sessionEvent = new SimpleEventDispatcher<Session | null>();
@@ -14,9 +17,13 @@ export class SessionService {
 	private _connection?: Connection;
 	private _session?: Session;
 
+	constructor(private _timeoutHandler: TimeoutHandler) {}
+
 	public async connect(url: string) {
 		this._janus = new Janus.Client(url, {
 			keepalive: 'true',
+			setTimeout: this._timeoutHandler.setTimeout,
+			clearTimeout: this._timeoutHandler.clearTimeout,
 			pc: {
 				config: {
 					iceServers: [
@@ -59,5 +66,9 @@ export class SessionService {
 
 	public onFailed(handler: ISimpleEventHandler<void>) {
 		this._failedEvent.asEvent().subscribe(handler);
+	}
+
+	public get timeoutHandler() {
+		return this._timeoutHandler;
 	}
 }

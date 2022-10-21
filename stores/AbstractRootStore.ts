@@ -117,13 +117,13 @@ export class AbstractRootStore {
 	}
 
 	public disconnect() {
-		clearTimeout(this._reconnectTimeout);
+		this._sessionService.timeoutHandler.clearTimeout(this._reconnectTimeout);
 		this._reconnectTimeout = undefined;
 		this._store.connected = null;
 		this._store.failed = false;
-		setTimeout(() => {
+		this._sessionService.timeoutHandler.setTimeout(() => {
 			this._sessionService.disconnect().catch(console.error);
-		});
+		}, 1);
 	}
 
 	public isConnected() {
@@ -142,14 +142,17 @@ export class AbstractRootStore {
 	}
 
 	private _reconnectWithTimeout() {
-		this._reconnectTimeout = setTimeout(() => {
-			this._reconnect()
-				.then(() => {
-					this._reconnectTimeout = undefined;
-				})
-				.catch(() => {
-					this._reconnectWithTimeout();
-				});
-		}, 5000);
+		this._reconnectTimeout = this._sessionService.timeoutHandler.setTimeout(
+			() => {
+				this._reconnect()
+					.then(() => {
+						this._reconnectTimeout = undefined;
+					})
+					.catch(() => {
+						this._reconnectWithTimeout();
+					});
+			},
+			5000,
+		);
 	}
 }
